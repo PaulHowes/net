@@ -5,7 +5,7 @@ Simple Networking for C++
 # Building
 
 Simple Networking is distributed only as a header. There is nothing to compile in this repository
-other than tests which also illustrate how to use `any`.
+other than tests which also illustrate how to use `net`.
 
 ## Dependencies
 
