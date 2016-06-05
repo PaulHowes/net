@@ -7,13 +7,15 @@
 namespace net {
   /**
    * @brief Extends net::socket_impl to create a server socket.
+   * @tparam traits A net::socket_traits object that defines the characteristics of the socket.
    */
-  class server : public socket_impl<server> {
+  template<typename traits>
+  class server : public socket_impl<server<traits>, traits> {
     public:
       /**
        * @brief Creates and initializes a new net::server object.
        */
-      server() : socket_impl() { }
+      server() : socket_impl<server<traits>, traits>() { }
 
       /**
        * @brief Constructs a new net::client object and connects to a remote host.
@@ -37,8 +39,9 @@ namespace net {
        *       return 0;
        *     }
        */
-      server(std::string const& name, unsigned short port) : socket_impl() { 
-        connect(name, port);
+      server(std::string const& name, unsigned short port)
+          : socket_impl<server<traits>, traits>() { 
+        this->connect(name, port);
       }
 
       /**
@@ -51,14 +54,14 @@ namespace net {
         // this has happened. If "address in use" errors are seen, not using SO_REUSEADDR is
         // usually the cause.
         int reuse = 1;
-        if(::setsockopt(fd_, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse)) < 0) {
+        if(::setsockopt(this->fd_, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse)) < 0) {
           std::ostringstream msg;
           msg << "Could not configure socket: " << errno;
           throw net::socket_error(msg.str());
         }
 
         // Connects (binds) this process to the socket created by socket_impl.
-        if(::bind(fd_, res0_->ai_addr, res0_->ai_addrlen) < 0) {
+        if(::bind(this->fd_, this->res0_->ai_addr, this->res0_->ai_addrlen) < 0) {
           std::ostringstream msg;
           msg << "Could not bind to socket: " << errno;
           throw net::socket_error(msg.str());
@@ -69,7 +72,7 @@ namespace net {
         // request is being serviced. If the queue is full, then clients will receive a
         // "connection refused" error. If requests are not handled quickly enough, then queued
         // requests may time out.
-        if(::listen(fd_, 10000) < 0) {
+        if(::listen(this->fd_, 10000) < 0) {
           std::ostringstream msg;
           msg << "Could not listen for incoming connections: " << errno;
           throw net::socket_error(msg.str());
@@ -85,13 +88,23 @@ namespace net {
       worker accept() {
         struct sockaddr_in addr;
         socklen_t len = sizeof(struct sockaddr_in);
-        int s = ::accept(fd_, reinterpret_cast<struct sockaddr*>(&addr), &len);
+        int s = ::accept(this->fd_, reinterpret_cast<struct sockaddr*>(&addr), &len);
         if(s < 0) {
           std::ostringstream msg;
           msg << "Could not accept incoming connection: " << errno;
           throw socket_error(msg.str());
         }
-        return worker(s, addr, len);
+        return worker(s, addr);
       }
   };
+
+  /**
+   * @brief Specialization of server<T> for TCP/IP sockets.
+   */
+  typedef server<tcp_traits> tcp_server;
+
+  /**
+   * @brief Specialization of server<T> for UDP/IP sockets.
+   */
+  typedef server<udp_traits> udp_server;
 }

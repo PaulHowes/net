@@ -17,12 +17,11 @@ namespace net {
        * @brief Creates a new net::worker from an existing socket file descriptor.
        * @param[in] s File descriptor for the worker socket.
        * @param[in] a Address information for the connected client.
-       * @param[in] l Length of the address information structure.
        *
        * This method should be invoked only by net::server.
        */
-      worker(int s, struct sockaddr_in a, socklen_t l) :
-          socket(s), _client_address(a), _address_length(l) {
+      worker(int s, struct sockaddr_in a) :
+          socket(s), _client_address(a) {
       }
 
       /**
@@ -59,10 +58,5 @@ namespace net {
        *        called.
        */
       struct sockaddr_in _client_address;
-
-      /**
-       * @brief The number of entries in the client_address structure.
-       */
-      socklen_t _address_length;
   };
 }

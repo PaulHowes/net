@@ -143,7 +143,12 @@ namespace net {
       int fd_;
   };
 
-  template<typename T, typename traits = tcp_ip_traits>
+  /**
+   * @brief Base implementation of an IP socket
+   * @tparam T Derived type of the concrete socket implementation
+   * @tparam traits A net::socket_traits object that defines the characteristics of the socket.
+   */
+  template<typename T, typename traits>
   class socket_impl : public socket {
     public:
       /**
@@ -218,3 +223,4 @@ namespace net {
       struct addrinfo* res0_;
   };
 }
+

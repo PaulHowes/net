@@ -13,5 +13,6 @@ namespace net {
     static inline int protocol() { return protocol_; }
   };
 
-  struct tcp_ip_traits : socket_traits<AI_PASSIVE, PF_INET, SOCK_STREAM, IPPROTO_TCP> { };
+  struct tcp_traits : socket_traits<AI_PASSIVE, PF_INET, SOCK_STREAM, IPPROTO_TCP> { };
+  struct udp_traits : socket_traits<AI_PASSIVE, PF_INET, SOCK_DGRAM,  IPPROTO_UDP> { };
 }

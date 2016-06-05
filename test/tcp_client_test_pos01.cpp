@@ -3,7 +3,7 @@
 
 int main() {
 
-  net::client c;
+  net::tcp_client c;
   c.connect("google.com", 80);
   c.write_line("GET /");
 

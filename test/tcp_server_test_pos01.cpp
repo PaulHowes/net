@@ -4,7 +4,7 @@
 #include <net.hpp>
 
 void server() {
-  net::server s;
+  net::tcp_server s;
   s.connect("localhost", 1234);
   net::worker w = s.accept();
   w.write_line("foobar");
@@ -17,7 +17,7 @@ int main() {
   std::this_thread::yield();
   std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
-  net::client c;
+  net::tcp_client c;
   c.connect("localhost", 1234);
 
   std::string received = c.read_line();
